@@ -1,10 +1,9 @@
 #ifndef SNAKEGAME_HPP
 #define SNAKEGAME_HPP
 
-#include <vector>
-#include <deque>	// For efficient adding/removing from snake body
-#include <utility>	// For std::pair or custom point struct
-#include <random>	// For random food generation
+#include <deque>        // For efficient adding/removing from snake body
+//#include <utility>	// If we use std::pair for Point(x, y) struct
+#include <random>       // For random food generation
 
 // Define a simple point structure for coordinates
 struct Point {

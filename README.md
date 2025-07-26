@@ -1,5 +1,7 @@
-Snake game, developed with c++ under linux using QT framework and OpenGL.
+Snake game, developed with C++ under Linux using QT Framework and OpenGL. Built using CMake.
 
-./qtSnake
+to start the game: ./qtSnake
+to toggle pause, press spacebar.
 
 ![](img/qtSnake.gif)
+

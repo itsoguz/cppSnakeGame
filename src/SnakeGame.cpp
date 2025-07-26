@@ -1,6 +1,5 @@
 #include "SnakeGame.hpp"
 #include <chrono>	// For seeding random number generator
-#include <algorithm>	// For std::find
 
 SnakeGame::SnakeGame() {
     // Seed the random number generator
@@ -14,11 +13,11 @@ void SnakeGame::resetGame() {
     m_snakeBody.push_front({GRID_SIZE / 2, GRID_SIZE / 2});
     m_snakeBody.push_front({GRID_SIZE / 2 + 1, GRID_SIZE / 2}); // Head
     m_currentDirection = Direction::Right;
-    m_nextDirection = Direction::Right; // Reset buffered direction
+    m_nextDirection = Direction::Right;                         // Reset buffered direction
     m_score = 0;
     m_gameOver = false;
     m_paused = false;
-    generateFood(); // Place initial food
+    generateFood();                                             // Place initial food
 }
 
 void SnakeGame::update() {
@@ -126,4 +125,3 @@ bool SnakeGame::checkCollision() {
 
     return false;
 }
-

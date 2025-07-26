@@ -1,15 +1,17 @@
 #include "GameWindow.hpp"
-#include <QOpenGLFunctions>	// Provides access to OpenGL functions
-#include <QDebug>		// For debugging output
+#include <QOpenGLFunctions>     // Provides access to OpenGL functions
+#include <QDebug>               // For debugging output
+#include <QPainter>
+#include <QFont>
 
-GameWindow::GameWindow(QWidget *parent)
+GameWindow::GameWindow(QWidget* parent)
     : QOpenGLWidget(parent),
       m_snakeGame(new SnakeGame()), // Initialize game logic
       m_gameTimer(new QTimer(this)) // Initialize game timer
 {
     // Connect the timer's timeout signal to the updateGame slot
     connect(m_gameTimer, &QTimer::timeout, this, &GameWindow::updateGame);
-    m_gameTimer->start(100);		// Start the timer, updating every 100ms (10 FPS)
+    m_gameTimer->start(100);            // Start the timer, updating every 100ms (10 FPS)
     setFocusPolicy(Qt::StrongFocus);	// Ensure widget can receive key events
 }
 
@@ -24,10 +26,10 @@ void GameWindow::initializeGL() {
     // Set clear color (background)
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-    // Enable depth testing (if you were rendering 3D objects)
+    // Enable depth testing (used if we want to render 3D objects)
     // glEnable(GL_DEPTH_TEST);
 
-    qDebug() << "OpenGL initialized.";
+    qDebug() << "OpenGL initialized.";  // In QT Creator: qDebug() sends the string message to "3 Application Output" tab on bottom
 }
 
 void GameWindow::resizeGL(int w, int h) {
@@ -43,11 +45,11 @@ void GameWindow::paintGL() {
     if (m_snakeGame->isGameOver()) {
         drawGameOver();
     } else {
-        drawGrid(); // Draw grid lines
-        drawSnake(); // Draw the snake
-        drawFood();  // Draw the food
+        drawGrid();
+        drawSnake();
+        drawFood();
     }
-    drawScore(); // Always draw the score
+    drawScore();        // Always draw the score
 }
 
 void GameWindow::keyPressEvent(QKeyEvent *event) {
@@ -66,12 +68,12 @@ void GameWindow::keyPressEvent(QKeyEvent *event) {
             m_snakeGame->changeDirection(SnakeGame::Direction::Right);
             break;
         case Qt::Key_Space:
-            m_snakeGame->togglePause(); // Pause/unpause the game
+            m_snakeGame->togglePause();     // Pause/unpause the game
             break;
         case Qt::Key_R: // Restart game
             if (m_snakeGame->isGameOver()) {
                 m_snakeGame->resetGame();
-                m_gameTimer->start(100); // Restart timer if it was stopped
+                m_gameTimer->start(100);    // Restart timer if it was stopped
             }
             break;
         default:
@@ -141,55 +143,55 @@ void GameWindow::drawGrid() {
     // Vertical lines
     for (int i = 0; i <= gridSize; ++i) {
         glVertex2f(i, 0.0f);
-        glVertex2f(i, (float)gridSize);
+        glVertex2f(i, static_cast<float>(gridSize));
     }
     // Horizontal lines
     for (int i = 0; i <= gridSize; ++i) {
         glVertex2f(0.0f, i);
-        glVertex2f((float)gridSize, i);
+        glVertex2f(static_cast<float>(gridSize), i);
     }
     glEnd();
 }
 
 void GameWindow::drawGameOver() {
-    // Simple text rendering for Game Over (using OpenGL raster position and bitmap font)
-    // For more advanced text, consider using Qt's QPainter on top of OpenGL or a dedicated text rendering library.
-    glColor3f(1.0f, 1.0f, 1.0f); // White color for text
+    QPainter painter(this);
+    painter.setPen(Qt::white);
 
-    // Position text in the center of the screen (adjust as needed)
-    // This is a very basic way to draw text. For better text rendering,
-    // you'd typically use QPainter over the OpenGL widget or a texture-based font system.
-    glRasterPos2f(m_snakeGame->getGridSize() / 2.0f - 5.0f, m_snakeGame->getGridSize() / 2.0f + 1.0f);
-    const char* gameOverText = "GAME OVER!";
-    for (const char* p = gameOverText; *p; p++) {
-        // glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *p); // Requires GLUT, often not ideal for Qt
-    }
-    glRasterPos2f(m_snakeGame->getGridSize() / 2.0f - 8.0f, m_snakeGame->getGridSize() / 2.0f - 1.0f);
-    const char* restartText = "Press 'R' to Restart";
-    for (const char* p = restartText; *p; p++) {
-        // glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *p);
-    }
-    // NOTE: glutBitmapCharacter is part of GLUT, which is not typically linked with Qt projects by default.
-    // For a real Qt/OpenGL project, you would draw text using QPainter on top of the QOpenGLWidget,
-    // or use a more robust OpenGL text rendering library.
-    // This is a placeholder to show where text rendering would go.
-    qDebug() << "Game Over!";
+    QFont gameOverFont("Arial", 36, QFont::Bold);
+    painter.setFont(gameOverFont);
+    QString gameOverText = "GAME OVER!";
+
+    // Calculate text bounding rectangle to center it
+    QFontMetrics fm(gameOverFont);
+    int textWidth = fm.horizontalAdvance(gameOverText);
+    int textHeight = fm.height();
+    int x = (width() - textWidth) / 2;      // Center horizontally
+    int y = (height() - textHeight) / 2;    // Center vertically (approx)
+    painter.drawText(x, y, gameOverText);
+
+    qDebug() << "Game Over!";               // Print to console output
+
+    // Draw "Press 'R' to Restart"
+    QFont restartFont("Arial", 18);
+    painter.setFont(restartFont);
+    QString restartText = "Press 'R' to Restart";
+    textWidth = fm.horizontalAdvance(restartText);  // Recalculate for new font
+    x = (width() - textWidth) / 2 + 120;            // Added 120px from left to center the text
+    // Position below "GAME OVER!" message
+    y += textHeight + 20;                           // Move down by text height + some padding
+    painter.drawText(x, y, restartText);
+
+    painter.end();
+    qDebug() << "Press 'R' to Restart.";
 }
 
 void GameWindow::drawScore() {
-    // Similar to drawGameOver, this is a placeholder.
-    // For actual score display, use QPainter or a dedicated text renderer.
-    glColor3f(1.0f, 1.0f, 1.0f); // White color
-    QString scoreStr = QString("Score: %1").arg(m_snakeGame->getScore());
-    // Position score at top-left
-    glRasterPos2f(1.0f, m_snakeGame->getGridSize() - 2.0f);
-    // Again, using GLUT for simplicity, but not recommended for production Qt apps.
-    // For example:
-    // QPainter painter(this);
-    // painter.setPen(Qt::white);
-    // painter.setFont(QFont("Arial", 16));
-    // painter.drawText(10, 20, scoreStr);
-    // painter.end();
-    qDebug() << scoreStr;
-}
+    QPainter painter(this);                 // Create a QPainter instance, drawing on 'this' widget
+    painter.setPen(Qt::white);              // Set the text color to white
+    painter.setFont(QFont("Arial", 16));    // Set the font and size
 
+    QString scoreStr = QString("Score: %1").arg(m_snakeGame->getScore());
+
+    painter.drawText(10, 18, scoreStr);     // Display the score: 10 pixels from left, 18 pixels from top
+    qDebug() << scoreStr;                   // Output scoreStr to console
+}

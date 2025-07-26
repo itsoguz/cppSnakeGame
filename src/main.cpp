@@ -1,14 +1,14 @@
 #include <QApplication>
-#include "GameWindow.hpp"		// Include the game window header
+#include "GameWindow.hpp"           // Include the game window header
 
 int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);	// Initialize the Qt application
+    QApplication app(argc, argv);   // Initialize the Qt application
 
     GameWindow gameWindow;		// Create an instance of your game window
-    gameWindow.setWindowTitle("OpenGL Snake Game");	// Set window title
-    gameWindow.resize(800, 600);	// Set initial window size
-    gameWindow.show();			// Display the window
+    gameWindow.setWindowTitle("qtSnake: OpenGL Snake Game");    // Set window title
+    gameWindow.resize(800, 600);    // Set initial window size
+    gameWindow.show();              // Display the window
 
-    return app.exec();			// Start the Qt event loop
+    return app.exec();              // Start the Qt event loop
 }
 
